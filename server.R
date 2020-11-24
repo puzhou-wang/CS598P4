@@ -15,7 +15,7 @@ get_user_ratings = function(value_list) {
   dat = dat[Rating > 0]
 }
 
-# read in data
+# read in movie data
 myurl = "https://liangfgithub.github.io/MovieData/"
 movies = readLines(paste0(myurl, 'movies.dat?raw=true'))
 movies = strsplit(movies, split = "::", fixed = TRUE, useBytes = TRUE)
@@ -25,11 +25,22 @@ colnames(movies) = c('MovieID', 'Title', 'Genres')
 movies$MovieID = as.integer(movies$MovieID)
 movies$Title = iconv(movies$Title, "latin1", "UTF-8")
 
+# read in movie images
 small_image_url = "https://liangfgithub.github.io/MovieImages/"
 movies$image_url = sapply(movies$MovieID, 
                           function(x) paste0(small_image_url, x, '.jpg?raw=true'))
 
-# todo: clean up the matrices; write prediction functions
+# read in rating data
+ratings = read.csv(paste0(myurl, 'ratings.dat?raw=true'), 
+                   sep = ':',
+                   colClasses = c('integer', 'NULL'), 
+                   header = FALSE)
+colnames(ratings) = c('UserID', 'MovieID', 'Rating', 'Timestamp')
+# clean up rating data
+ratings = ratings[(!is.na(ratings$Rating))&(ratings$Rating<=5),]
+
+
+# todo: write prediction functions into source R files
 
 
 shinyServer(function(input, output, session) {
@@ -74,6 +85,54 @@ shinyServer(function(input, output, session) {
   }) # clicked on button
   
 
+  # display the recommendations
+  output$results <- renderUI({
+    num_rows <- 2
+    num_movies <- 5
+    recom_result <- df()
+    
+    lapply(1:num_rows, function(i) {
+      list(fluidRow(lapply(1:num_movies, function(j) {
+        box(width = 2, status = "success", solidHeader = TRUE, title = paste0("Rank ", (i - 1) * num_movies + j),
+            
+            div(style = "text-align:center", 
+                a(img(src = movies$image_url[recom_result$MovieID[(i - 1) * num_movies + j]], height = 150))
+            ),
+            div(style="text-align:center; font-size: 100%", 
+                strong(movies$Title[recom_result$MovieID[(i - 1) * num_movies + j]])
+            )
+            
+        )        
+      }))) # columns
+    }) # rows
+    
+  }) # renderUI function
+  
+  
+  # Calculate recommendations based on the selected genre
+  df <- eventReactive(input$sys1_btn, {
+    withBusyIndicatorServer("sys1_btn", { # showing the busy indicator
+      # hide the rating container
+      useShinyjs()
+      jsCode <- "document.querySelector('[data-widget=collapse]').click();"
+      runjs(jsCode)
+      
+      # get the user's rating data
+      value_list <- reactiveValuesToList(input)
+      user_ratings <- get_user_ratings(value_list)
+      
+      user_results = (1:10)/10
+      user_predicted_ids = 1:10
+      recom_results <- data.table(Rank = 1:10, 
+                                  MovieID = movies$MovieID[user_predicted_ids], 
+                                  Title = movies$Title[user_predicted_ids], 
+                                  Predicted_rating =  user_results)
+      
+    }) # still busy
+    
+  }) # clicked on button for genre-based recommendation
+  
+  
   # display the recommendations
   output$results <- renderUI({
     num_rows <- 2

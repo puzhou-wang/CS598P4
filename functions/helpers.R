@@ -66,6 +66,14 @@ errorFunc <- function(err, buttonId) {
   shinyjs::show(selector = errEl, anim = TRUE, animType = "fade")
 }
 
+# Genre list
+genre_list = c("Action", "Adventure", "Animation", 
+               "Children's", "Comedy", "Crime",
+               "Documentary", "Drama", "Fantasy",
+               "Film-Noir", "Horror", "Musical", 
+               "Mystery", "Romance", "Sci-Fi", 
+               "Thriller", "War", "Western")
+
 appCSS <- "
 .btn-loading-container {
   margin-left: 10px;

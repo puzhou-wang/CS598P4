@@ -27,9 +27,7 @@ shinyUI(
                 tabItem(tabName = 'rec_genre',
                           fluidRow(
                             box(width = 12, title = "Step 1: Select your favorite genre", status = "info", solidHeader = TRUE, collapsible = TRUE,
-                                div(class = "rateitems",
-                                    uiOutput('user_genre')
-                                )
+                                selectInput("user_genre", 'select a single genre from the dropdown menu', genre_list)
                             )
                           ),
                           fluidRow(
@@ -39,7 +37,7 @@ shinyUI(
                               title = "Step 2: Discover movies you might like",
                               br(),
                               withBusyIndicatorUI(
-                                actionButton("btn", "Click here to get your recommendations", class = "btn-warning")
+                                actionButton("sys1_btn", "Click here to get your recommendations", class = "btn-warning")
                               ),
                               br(),
                               tableOutput("rec_genre_results")
