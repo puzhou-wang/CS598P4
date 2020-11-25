@@ -30,7 +30,8 @@ movies$image_url = sapply(movies$MovieID,
                           function(x) paste0(small_image_url, x, '.jpg?raw=true'))
 
 # read in rating data; read local version because scan() failed sporadically for remote reading
-ratings = read.csv('data/ratings.dat', 
+# local version: ratings = read.csv('data/ratings.dat', 
+ratings = read.csv(paste0(myurl, 'ratings.dat?raw=true'),
                    sep = ':',
                    colClasses = c('integer', 'NULL'), 
                    header = FALSE)
