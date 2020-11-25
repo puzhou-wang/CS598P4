@@ -1,12 +1,8 @@
-# BookRecommender
+# MovieRecommender
 
-This is code for a shiny app for a book recommender based on collaborative filtering. 
+This is code for a shiny app for two movie recommenders, one based on movie genre and popularity (i.e., number of reviews) and the other based on User-Based Collaborative filtering (UBCF). 
 
-For more information: See this [kernel](https://www.kaggle.com/philippsp/book-recommender-collaborative-filtering-shiny) on Kaggle.com.
 
 Credits:
-My thanks go to the following persons:
-1. Stefan Nicklic for his [improved implementation of collaborative filtering](https://github.com/smartcat-labs/collaboratory).
-2. Stefan Wilhelm for providing [ShinyRatingInput](https://github.com/stefanwilhelm/ShinyRatingInput).
-3. Dean Attali for his work on [shinyJS](https://github.com/daattali/shinyjs).
-4. Kaggle user [Foxtrot](https://www.kaggle.com/zygmunt) for providing the [goodbooks dataset](https://www.kaggle.com/zygmunt/goodbooks-10k).
+I would like to thank Prof. Feng Liang for her instructions and guidance on codes. Several parts of this repo are borrowed from her [notebook](https://liangfgithub.github.io/Rcode_W13_Movie_RS.nb.html).
+The shiny app is also largely modified from the scaffold of the gorgeous [BookRecommender](https://github.com/pspachtholz/BookRecommender) app build by Philipp Spachtholz. 
