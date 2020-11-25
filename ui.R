@@ -37,7 +37,7 @@ shinyUI(
                               title = "Step 2: Discover movies you might like",
                               br(),
                               withBusyIndicatorUI(
-                                actionButton("sys1_btn", "Click here to get your recommendations", class = "btn-warning")
+                                actionButton("genrebtn", "Click here to get your recommendations", class = "btn-warning")
                               ),
                               br(),
                               tableOutput("rec_genre_results")
@@ -48,7 +48,8 @@ shinyUI(
                 tabItem(tabName = 'rec_rate',
                         fluidRow(
                           box(width = 12, title = "Step 1: Rate as many movies as possible", status = "info", solidHeader = TRUE, collapsible = TRUE,
-                              div(class = "rateitems",
+                              div(id = 'user_rating',
+                                  class = "rateitems",
                                   uiOutput('ratings')
                               )
                           )

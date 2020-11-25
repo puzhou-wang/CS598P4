@@ -39,9 +39,6 @@ colnames(ratings) = c('UserID', 'MovieID', 'Rating', 'Timestamp')
 ratings = ratings[(!is.na(ratings$Rating))&(ratings$Rating<=5),]
 
 
-# todo: write prediction functions into source R files
-
-
 shinyServer(function(input, output, session) {
   
   # show the movies to be rated
@@ -54,7 +51,7 @@ shinyServer(function(input, output, session) {
         list(box(width = 2,
                  div(style = "text-align:center", img(src = movies$image_url[(i - 1) * num_movies + j], height = 150)),
                  div(style = "text-align:center", strong(movies$Title[(i - 1) * num_movies + j])),
-                 div(style = "text-align:center; font-size: 150%; color: #f0ad4e;", ratingInput(paste0("select_", movies$MovieID[(i - 1) * num_movies + j]), label = "", dataStop = 5)))) #00c0ef
+                 div(style = "text-align:center; font-size: 150%; color: #f0ad4e;", ratingInput(paste0("select_", movies$MovieID[(i - 1) * num_movies + j]), label = "", dataStop = 5))))
       })))
     })
   })
@@ -69,15 +66,16 @@ shinyServer(function(input, output, session) {
       
       # get the user's rating data
       value_list <- reactiveValuesToList(input)
-      user_ratings <- get_user_ratings(value_list)
+      user_ratings <- get_user_ratings(value_list)   # list
       
-      user_results = (1:10)/10
-      user_predicted_ids = 1:10
-      recom_results <- data.table(Rank = 1:10, 
-                                  MovieID = movies$MovieID[user_predicted_ids], 
-                                  Title = movies$Title[user_predicted_ids], 
-                                  Predicted_rating =  user_results)
-        
+      # run UBCF
+      recom_res = rateRecommender(ratings, user_ratings)
+      
+      # extract MovieIDs and ratings from recommendation results
+      recom_res = recom_res[order(-recom_res$rating), , drop=F]
+      
+      recom_res
+
     }) # still busy
     
   }) # clicked on button for UBCF tab
@@ -94,13 +92,11 @@ shinyServer(function(input, output, session) {
         box(width = 2, status = "success", solidHeader = TRUE, title = paste0("Rank ", (i - 1) * num_movies + j),
             
             div(style = "text-align:center", 
-                a(img(src = movies$image_url[recom_result$MovieID[(i - 1) * num_movies + j]], height = 150))
+                a(img(src = movies[movies$MovieID==as.integer(sub('m','',recom_result$item[(i-1)*num_movies+j])), 'image_url'], height = 150))
             ),
             div(style="text-align:center; font-size: 100%", 
-                strong(movies$Title[recom_result$MovieID[(i - 1) * num_movies + j]])
+                strong(movies[movies$MovieID==as.integer(sub('m','',recom_result$item[(i-1)*num_movies+j])), 'Title'], height = 150))
             )
-            
-        )        
       }))) # columns
     }) # rows
     
@@ -108,8 +104,8 @@ shinyServer(function(input, output, session) {
   
   
   # Calculate recommendations based on the selected genre
-  df_genre <- eventReactive(input$sys1_btn, {
-    withBusyIndicatorServer("sys1_btn", { # showing the busy indicator
+  df_genre <- eventReactive(input$genrebtn, {
+    withBusyIndicatorServer("genrebtn", { # showing the busy indicator
       # hide the rating container
       useShinyjs()
       jsCode <- "document.querySelector('[data-widget=collapse]').click();"
